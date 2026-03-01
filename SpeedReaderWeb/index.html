@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SpeedReader</title>
+
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#F5A623">
+    <link rel="icon" type="image/png" href="icon-R.png">
+    <link rel="apple-touch-icon" href="icon-R.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SpeedReader">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Georgia&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- PDF.js library for local serverless parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+</head>
+
+<body>
+    <!-- Top Cinematic Progress Bar -->
+    <div id="topProgressBar" class="hidden">
+        <div id="progressFill"></div>
+        <div id="progressMetadata">
+            <span id="progressPercentage">0.0%</span> | <span id="progressWordCount">0 / 0</span>
+        </div>
+    </div>
+
+    <div id="app">
+        <!-- Library View (Local Upload) -->
+        <div id="libraryView" class="view-panel">
+            <h1 class="logo">SpeedReader</h1>
+            <p class="subtitle">Cinematic PWA Edition</p>
+            <div class="upload-box">
+                <input type="file" id="fileInput" accept=".txt, .pdf, application/pdf" class="hidden">
+                <label for="fileInput" class="never-btn">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                    </svg>
+                    <span>LOAD BOOK (.TXT / .PDF)</span>
+                </label>
+            </div>
+            <div id="bookList" class="book-list">
+                <p class="placeholder-text">Click LOAD BOOK to choose a local file.</p>
+            </div>
+        </div>
+
+        <!-- Reader View (RSVP & Classic) -->
+        <div id="readerView" class="view-panel hidden">
+            <header class="reader-header">
+                <button id="backBtn" class="never-icon-btn" title="Back">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                    </svg>
+                </button>
+                <h2 id="bookTitle">Book Title</h2>
+                <div style="width: 48px;"></div>
+            </header>
+
+            <main class="reader-main">
+                <!-- 1) RSVP Screen-Centered View -->
+                <div id="rsvpView" class="rsvp-active-zone">
+                    <div id="focal-dot"></div>
+                    <div id="rsvpWordContainer">
+                        <!-- Words injected dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- 2) Classic Scrollable View -->
+                <div id="classicView" class="classic-active-zone hidden">
+                    <div id="classicPage">
+                        <!-- Paragraphs and words injected via JS -->
+                    </div>
+                </div>
+            </main>
+
+            <footer class="reader-footer">
+                <!-- NEVER Button Control Bar -->
+                <div class="controls-bar">
+                    <button id="jumpBackBtn" class="never-icon-btn" title="-500 Words">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z" />
+                        </svg>
+                    </button>
+                    <button id="resetBtn" class="never-icon-btn" title="Restart">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6c-1.66 0-3.14-.69-4.22-1.78l-1.41 1.41C8.83 19.82 10.35 20.5 12 20.5c4.69 0 8.5-3.81 8.5-8.5S16.69 5 12 5z" />
+                        </svg>
+                    </button>
+                    <button id="playPauseBtn" class="never-btn play-btn" title="Play/Pause">
+                        <span id="playIconWrapper">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                        </span>
+                    </button>
+                    <button id="toggleModeBtn" class="never-icon-btn" title="Toggle Classic Mode">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" />
+                        </svg>
+                    </button>
+                    <button id="jumpFwdBtn" class="never-icon-btn" title="+500 Words">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M13 6v12l8.5-6L13 6zM4.5 18l8.5-6-8.5-6v12z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <button id="settingsToggleBtn" class="never-btn settings-toggle">SETTINGS</button>
+
+                <!-- Settings Panel -->
+                <div id="settingsPanel" class="settings-panel hidden">
+                    <div class="setting-row">
+                        <label>Speed (WPM): <span id="wpmLabel">300</span></label>
+                        <input type="range" id="wpmSlider" min="100" max="1000" step="25" value="300">
+                    </div>
+                    <div class="setting-row">
+                        <label>Words per Flash: <span id="chunkSizeLabel">1</span></label>
+                        <input type="range" id="chunkSizeSlider" min="1" max="10" step="1" value="1">
+                    </div>
+                    <div class="setting-row">
+                        <label>Filter Punctuation</label>
+                        <input type="checkbox" id="punctuationFilterToggle" checked>
+                    </div>
+                    <div class="setting-row">
+                        <label>Show Target Dot</label>
+                        <input type="checkbox" id="showFocalDotToggle" checked>
+                    </div>
+                    <div class="setting-row">
+                        <label>Dot Color:</label>
+                        <input type="color" id="focalColor" value="#ff0000">
+                    </div>
+                    <div class="setting-row">
+                        <label>Dot Size:</label>
+                        <input type="range" id="dotSizeSlider" min="2" max="30" step="1" value="6">
+                    </div>
+                    <div class="setting-row">
+                        <label>Text Color:</label>
+                        <input type="color" id="textColor" value="#ffffff">
+                    </div>
+                    <div class="setting-row">
+                        <label>Text Size:</label>
+                        <input type="range" id="textSizeSlider" min="20" max="150" step="2" value="64">
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Main Logic -->
+    <script src="script.js"></script>
+</body>
+
+</html>
