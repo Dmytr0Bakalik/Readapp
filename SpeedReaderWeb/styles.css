@@ -1,0 +1,398 @@
+:root {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --accent-orange: #F5A623;
+    --focal-color: #ff0000;
+    --reader-txt-color: #ffffff;
+    --reader-bg-color: transparent;
+    --focal-size: 6px;
+    --reader-txt-size: 64px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    /* Prevent body scroll, handle inside views */
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ---------------------------------
+   Top Cinematic Progress Bar (Red Line)
+------------------------------------ */
+.top-progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    height: 4px;
+    background-color: #1a1a1a;
+    z-index: 1000;
+}
+
+.top-progress-fill {
+    height: 100%;
+    width: 0%;
+    background-color: #ff0000;
+    /* Red line requested */
+    box-shadow: 0 0 10px #ff0000;
+    transition: width 0.1s linear;
+}
+
+.top-progress-text {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: #888;
+    letter-spacing: 1px;
+}
+
+/* ---------------------------------
+   App Containers & Layout
+------------------------------------ */
+.app-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.view-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Library View */
+.logo-title {
+    font-size: 48px;
+    font-weight: 800;
+    margin: 0 0 5px 0;
+    letter-spacing: -1px;
+}
+
+.subtitle {
+    color: var(--accent-orange);
+    margin: 0 0 40px 0;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.upload-container {
+    margin-bottom: 30px;
+}
+
+.book-list {
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+.placeholder-text {
+    color: #555;
+    font-size: 14px;
+}
+
+/* ---------------------------------
+   NEVER Button System
+------------------------------------ */
+.never-btn,
+.never-icon-btn,
+.settings-btn {
+    background-color: var(--accent-orange);
+    color: #000000;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease-in-out;
+}
+
+.never-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.never-icon-btn {
+    padding: 12px;
+    width: 48px;
+    height: 48px;
+}
+
+.never-icon-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #000000;
+}
+
+.play-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+}
+
+.play-btn svg {
+    width: 32px;
+    height: 32px;
+    fill: #000000;
+}
+
+/* Interactive Glow States */
+.never-btn:hover,
+.never-icon-btn:hover {
+    background-color: #ffb732;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(245, 166, 35, 0.7), 0 0 40px rgba(245, 166, 35, 0.3);
+}
+
+.never-btn:active,
+.never-icon-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 10px rgba(245, 166, 35, 0.9);
+}
+
+/* ---------------------------------
+   Reader View Layout
+------------------------------------ */
+.reader-header {
+    width: 100%;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    position: absolute;
+    top: 20px;
+}
+
+.book-title {
+    font-size: 16px;
+    font-weight: 400;
+    color: #666;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+.header-spacer {
+    width: 48px;
+}
+
+/* counters back button width */
+
+.reader-main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.reader-footer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 40px;
+    gap: 20px;
+}
+
+.controls-bar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+/* ---------------------------------
+   RSVP Screen-Centered Engine
+------------------------------------ */
+.rsvp-active-zone {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    /* Anchor for absolute targeting */
+}
+
+#focal-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--focal-size);
+    height: var(--focal-size);
+    background-color: var(--focal-color);
+    border-radius: 50%;
+    z-index: 10;
+    /* Float above text */
+}
+
+.rsvp-word-wrapper {
+    /* Absolute geometric center forced */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    /* prevent single words from breaking naturally */
+    font-size: var(--reader-txt-size);
+    font-weight: 700;
+    color: var(--reader-txt-color);
+    background-color: var(--reader-bg-color);
+}
+
+.rsvp-multi-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+    font-size: var(--reader-txt-size);
+    font-weight: 700;
+    color: var(--reader-txt-color);
+    background-color: var(--reader-bg-color);
+}
+
+.rsvp-line {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+}
+
+/* ---------------------------------
+   Classic Reader View (Restored)
+------------------------------------ */
+.classic-active-zone {
+    width: 100%;
+    height: calc(100vh - 250px);
+    overflow-y: auto;
+    padding-top: 40px;
+    box-sizing: border-box;
+}
+
+.classic-page {
+    width: 100%;
+    max-width: 680px;
+    font-family: 'Georgia', serif;
+    font-size: 18px;
+    line-height: 1.6;
+    background-color: #ffffff;
+    color: #000000;
+    text-align: justify;
+    padding: 60px 80px;
+    /* Simulate a real PDF page / physical paper */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+    margin: 0 auto 60px auto;
+    /* Centers it horizontally, adds bottom margin */
+    box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+    .classic-page {
+        padding: 30px 20px;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+}
+
+.classic-paragraph {
+    margin-bottom: 1.4em;
+    text-indent: 2em;
+}
+
+.classic-word {
+    cursor: pointer;
+    transition: all 0.1s;
+    border-radius: 2px;
+}
+
+.classic-word:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.classic-word.active-word {
+    background-color: var(--accent-orange);
+    color: #000;
+    font-weight: bold;
+}
+
+/* ---------------------------------
+   Advanced Settings Panel
+------------------------------------ */
+.settings-btn {
+    font-size: 12px;
+    padding: 8px 16px;
+    background-color: #222;
+    /* subdued initially */
+    color: #888;
+    box-shadow: none;
+}
+
+.settings-btn:hover {
+    background-color: var(--accent-orange);
+    color: #000;
+}
+
+.settings-panel {
+    background-color: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.setting-row input[type="range"] {
+    width: 150px;
+}
